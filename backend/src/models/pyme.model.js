@@ -6,12 +6,16 @@ import mongoose from "mongoose";
 
 const pymeSchema = new mongoose.Schema(
     {
-        idPyme: {
+        idUser: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,
         },
         nombre: {
+            type: String,
+            required: true,
+        },
+        descripcion: {
             type: String,
             required: true,
         },

@@ -7,7 +7,7 @@ const phoneRegex = /^[0-9]{9}$/; // Solo acepta 9 digitos
  * Esquema de validacion para el cuerpo de la solicitud de pyme
  */
 const pymeBodySchema = Joi.object({
-    idPyme: Joi.string()
+    idUser: Joi.string()
     .required()
     .pattern(/^(?:[0-9a-fA-F]{24}|[0-9a-fA-F]{12})$/)
     .messages({
@@ -22,6 +22,13 @@ const pymeBodySchema = Joi.object({
         "string.base": "El nombre debe ser de tipo string.",
         "string.min": "El nombre debe tener al menos 3 caracteres.",
         "string.max": "El nombre debe tener como máximo 100 caracteres.",
+    }),
+    descripcion: Joi.string().required().min(3).max(250).messages({
+        "string.empty": "La descripcion no puede estar vacía.",
+        "any.required": "La descripcion es obligatoria.",
+        "string.base": "La descripcion debe ser de tipo string.",
+        "string.min": "La descripcion debe tener al menos 3 caracteres.",
+        "string.max": "La descripcion debe tener como máximo 250 caracteres.",
     }),
     telefono: Joi.string().pattern(phoneRegex).required().messages({
         "string.empty": "El telefono no puede estar vacío.",
