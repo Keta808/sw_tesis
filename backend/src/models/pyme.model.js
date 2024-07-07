@@ -1,8 +1,6 @@
 "use strinct";
 
 import mongoose from "mongoose";
-// import bcrypt from "bcryptjs";
-// import CATEGORIA from "../constants/categoria.constants.js";
 
 const pymeSchema = new mongoose.Schema(
     {
@@ -28,6 +26,15 @@ const pymeSchema = new mongoose.Schema(
             required: true,
         },
         email: {
+            type: String,
+            required: true,
+        }, 
+        categoria: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "CategoriaModel",
+            required: true,
+        }, 
+        descripcion: {
             type: String,
             required: true,
         },

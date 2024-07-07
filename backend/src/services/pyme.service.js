@@ -1,6 +1,9 @@
 "use strict";
 // Importa el modelo de datos 'Pyme'
-import Pyme from "../models/pyme.model.js";
+import Pyme from "../models/pyme.model.js"; 
+import CategoriaModel from "../models/categoria.model.js"; 
+import CATEGORIA from "../constants/categoria.constant.js"; 
+
 import { handleError } from "../utils/errorHandler.js";
 
 /**
@@ -22,7 +25,7 @@ async function getPymes() {
  */
 async function createPyme(pyme) {
     try {
-        const { idPyme, nombre, telefono, comuna, direccion, email } = pyme;
+        const { idPyme, nombre, telefono, comuna, direccion, email, categoria, descripcion } = pyme;
     
         const pymeFound = await Pyme.findOne({
             email: pyme.email,
@@ -30,7 +33,12 @@ async function createPyme(pyme) {
             direccion: pyme.direccion,
         });
 
-        if (pymeFound) return [null, "La pyme ya existe"];
+        if (pymeFound) return [null, "La pyme ya existe"]; 
+       
+        // Validación de la categoría
+        if (!CATEGORIA.includes(categoria)) {
+            return [null, "Categoría inválida"];
+        }
     
         const newPyme = new Pyme({
         idPyme,
@@ -38,7 +46,10 @@ async function createPyme(pyme) {
         telefono,
         comuna,
         direccion,
-        email,
+        email, 
+        categoria, 
+        descripcion, 
+
         });
         await newPyme.save();
     
@@ -99,7 +110,7 @@ async function updatePyme(id, pyme) {
         const pymeFound = await Pyme.findById(id);
         if (!pymeFound) return [null, "La pyme no existe"];
     
-        const { idPyme, nombre, telefono, comuna, direccion, email } = pyme;
+        const { idPyme, nombre, telefono, comuna, direccion, email, categoria, descripcion } = pyme;
         const updateFields = {
             idPyme,
             nombre,
@@ -107,6 +118,8 @@ async function updatePyme(id, pyme) {
             comuna,
             direccion,
             email,
+            categoria,
+            descripcion,
         };
 
         // Actualiza la pyme y retorna la pyme actualizada
@@ -131,6 +144,63 @@ async function deletePyme(id) {
         handleError(error, "pyme.service -> deletePyme");
     }
 }
+/**
+ * Filtrar pymes por categoría --  REVISAR/SIN PROBAR
+ */ 
+async function getPymesByCategory(categoria) {
+    try {
+        // Verificar si la categoría es válida
+        if (!CATEGORIA.includes(categoria)) {
+            return [null, "Categoría inválida"];
+        }
+
+        // Buscar todas las categorías con el tipo de servicio especificado
+        const categories = await CategoriaModel.find({ categoria: categoria }).exec();
+
+        if (!categories || categories.length === 0) {
+            return [null, "No se encontraron pymes con esa categoría"];
+        }
+
+        // Extraer los IDs de las Pymes asociadas a esas categorías
+        const pymeIds = categories.map((cat) => cat.idPyme);
+
+        // Buscar todas las Pymes con esos IDs
+        const pymes = await Pyme.find({ _id: { $in: pymeIds } }).exec();
+
+        return [pymes, null];
+    } catch (error) {
+        handleError(error, "pyme.service -> getPymesByCategory");
+    }
+} 
+/**
+ * Filtrar pymes por categoría y comuna
+ */
+async function getPymesByCategoryAndComuna(categoria, comuna) {
+    try {
+        // Verificar si la categoría es válida
+        if (!CATEGORIA.includes(categoria)) {
+            return [null, "Categoría inválida"];
+        }
+
+        // Buscar todas las categorías con el tipo de servicio especificado
+        const categories = await CategoriaModel.find({ tipoServicio: categoria }).exec();
+
+        if (!categories || categories.length === 0) {
+            return [null, "No se encontraron pymes con esa categoría"];
+        }
+
+        // Extraer los IDs de las Pymes asociadas a esas categorías
+        const pymeIds = categories.map((cat) => cat.idPyme);
+
+        // Buscar todas las Pymes con esos IDs y en la comuna especificada
+        const pymes = await Pyme.find({ _id: { $in: pymeIds }, comuna }).exec();
+
+        return [pymes, null];
+    } catch (error) {
+        handleError(error, "pyme.service -> getPymesByCategoryAndComuna"); 
+    }
+}
+
 
 // Exporta las funciones del servicio de pymes
 export default {
@@ -140,5 +210,7 @@ export default {
     getPymesByName,
     getPymesByComuna,
     updatePyme,
-    deletePyme,
+    deletePyme, 
+    getPymesByCategory,
+    getPymesByCategoryAndComuna,
 };

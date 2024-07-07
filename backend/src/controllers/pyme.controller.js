@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 "use strict";
 
 import { respondSuccess, respondError } from "../utils/resHandler.js";
@@ -135,8 +136,37 @@ async function deletePyme(req, res) {
         handleError(error, "pyme.controller -> deletePyme");
         respondError(req, res, 400, `Error eliminando la pymes por id: ${error.message}`);
     }
-}
+} 
 
+
+/**
+ * Filtrar pymes por categoría --  REVISAR/SIN PROBAR
+ */  
+async function getPymesByCategory(req, res) { 
+    try { 
+        const { categoria } = req.params; 
+        const [pymes, errorPymes] = await PymeService.getPymesByCategory(categoria); 
+        if (errorPymes) return respondError(req, res, 404, errorPymes); 
+        if (!pymes) return respondSuccess(req, res, 204); 
+    } catch (error) { 
+        handleError(error, "pyme.controller -> getPymesByCategory"); 
+        respondError(req, res, 400, `Error obteniendo las pymes por categoría: ${error.message}`); 
+    } 
+} 
+/**
+ * Filtrar pymes por categoría y comuna
+ */
+async function getPymesByCategoryAndComuna(req, res) {
+    try {
+        const { categoria, comuna } = req.params;
+        const [pymes, errorPymes] = await PymeService.getPymesByCategoryAndComuna(categoria, comuna);
+        if (errorPymes) return respondError(req, res, 404, errorPymes);
+        if (!pymes) return respondSuccess(req, res, 204);
+    } catch (error) {
+        handleError(error, "pyme.controller -> getPymesByCategoryAndComuna");
+        respondError(req, res, 400, `Error obteniendo las pymes por categoría y comuna: ${error.message}`);
+    }
+}
 export default {
     getPymes,
     createPyme,
@@ -144,5 +174,8 @@ export default {
     getPymesByName,
     getPymesByComuna,
     updatePyme,
-    deletePyme,
+    deletePyme, 
+
+    getPymesByCategory, 
+    getPymesByCategoryAndComuna,
 };
