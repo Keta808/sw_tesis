@@ -25,7 +25,7 @@ async function getPymes() {
  */
 async function createPyme(pyme) {
     try {
-        const { idPyme, nombre, telefono, comuna, direccion, email, categoria, descripcion } = pyme;
+        const { idPyme, nombre, telefono, comuna, direccion, email } = pyme;
     
         const pymeFound = await Pyme.findOne({
             email: pyme.email,
@@ -41,8 +41,9 @@ async function createPyme(pyme) {
         }
     
         const newPyme = new Pyme({
-        idPyme,
+        idUser,
         nombre,
+        descripcion,
         telefono,
         comuna,
         direccion,
@@ -110,10 +111,11 @@ async function updatePyme(id, pyme) {
         const pymeFound = await Pyme.findById(id);
         if (!pymeFound) return [null, "La pyme no existe"];
     
-        const { idPyme, nombre, telefono, comuna, direccion, email, categoria, descripcion } = pyme;
+        const { idPyme, nombre, telefono, comuna, direccion, email } = pyme;
         const updateFields = {
-            idPyme,
+            idUser,
             nombre,
+            descripcion,
             telefono,
             comuna,
             direccion,
