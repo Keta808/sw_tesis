@@ -8,6 +8,10 @@ import userRoutes from "./user.routes.js";
 /** Enrutador de pymes */
 import pymeRoutes from "./pyme.routes.js";
 
+/** Enrutador de Horas */
+
+import horaSlotRoutes from "./horaSlot.routes.js";
+
 /** Enrutador de autenticación */
 import authRoutes from "./auth.routes.js";
 
@@ -24,6 +28,7 @@ router.use("/auth", authRoutes);
 
 // Define las rutas para las pymes /api/pymes
 router.use("/pymes", pymeRoutes);
+router.use("/hora", horaSlotRoutes);
 
 // Exporta el enrutador
 export default router;
