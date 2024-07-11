@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 "use strict";
 
 import { respondSuccess, respondError } from "../utils/resHandler.js";
@@ -44,7 +45,7 @@ async function createHoraSlot(req, res) {
 
         // Convertir la fecha de "DD-MM-YYYY" a Date
         const { idPyme, fecha, hora, disponibilidad } = body;
-        const [day, month, year] = fecha.split('-');
+        const [day, month, year] = fecha.split("-");
         const isoDate = new Date(`${year}-${month}-${day}T00:00:00.000Z`);
 
         const yesterday = new Date();
@@ -168,6 +169,6 @@ export default {
     updateHoraSlotById,
     getHoraSlotById,
     getHoraSlotByIdPyme,
-    createRangeHour: createRangeHourController
+    createRangeHour: createRangeHourController,
 
 };

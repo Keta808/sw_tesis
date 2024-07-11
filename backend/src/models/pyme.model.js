@@ -1,7 +1,8 @@
 "use strinct";
 
 import mongoose from "mongoose";
-
+import TipoServicio from "../constants/categoria.constant.js"; 
+import Comunas from "../constants/comuna.constant.js"; 
 const pymeSchema = new mongoose.Schema(
     {
         idUser: {
@@ -23,6 +24,7 @@ const pymeSchema = new mongoose.Schema(
         },
         comuna: {
             type: String,
+            enum: Comunas,
             required: true,
         },
         direccion: {
@@ -34,12 +36,8 @@ const pymeSchema = new mongoose.Schema(
             required: true,
         }, 
         categoria: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "CategoriaModel",
-            required: true,
-        }, 
-        descripcion: {
             type: String,
+            enum: TipoServicio,
             required: true,
         },
     },

@@ -1,7 +1,7 @@
+/* eslint-disable no-console */
 "use strict";
 // Importa el modelo de datos 'Pyme'
 import Pyme from "../models/pyme.model.js"; 
-import CategoriaModel from "../models/categoria.model.js"; 
 import CATEGORIA from "../constants/categoria.constant.js"; 
 
 import { handleError } from "../utils/errorHandler.js";
@@ -25,7 +25,7 @@ async function getPymes() {
  */
 async function createPyme(pyme) {
     try {
-        const { idPyme, nombre, telefono, comuna, direccion, email } = pyme;
+        const { idUser, nombre, descripcion, telefono, comuna, direccion, email, categoria } = pyme;
     
         const pymeFound = await Pyme.findOne({
             email: pyme.email,
@@ -49,7 +49,6 @@ async function createPyme(pyme) {
         direccion,
         email, 
         categoria, 
-        descripcion, 
 
         });
         await newPyme.save();
@@ -94,8 +93,10 @@ async function getPymesByName(nombre) {
 async function getPymesByComuna(comuna) {
     try {
         const pymes = await Pyme.find({ comuna }).exec();
-        if (!pymes || pymes.length === 0) return [null, "No se encontraron pymes en la comuna"];
-    
+        if (!pymes || pymes.length === 0) {
+            return [null, "No se encontraron pymes en la comuna"];
+        }
+
         return [pymes, null];
     } catch (error) {
         handleError(error, "pyme.service -> getPymesByComuna");
@@ -111,7 +112,7 @@ async function updatePyme(id, pyme) {
         const pymeFound = await Pyme.findById(id);
         if (!pymeFound) return [null, "La pyme no existe"];
     
-        const { idPyme, nombre, telefono, comuna, direccion, email } = pyme;
+        const { idUser, nombre, descripcion, telefono, comuna, direccion, email, categoria } = pyme;
         const updateFields = {
             idUser,
             nombre,
@@ -121,7 +122,6 @@ async function updatePyme(id, pyme) {
             direccion,
             email,
             categoria,
-            descripcion,
         };
 
         // Actualiza la pyme y retorna la pyme actualizada
@@ -146,36 +146,35 @@ async function deletePyme(id) {
         handleError(error, "pyme.service -> deletePyme");
     }
 }
+
 /**
- * Filtrar pymes por categoría --  REVISAR/SIN PROBAR
- */ 
+ * Filtrar pymes por categoría
+ */
 async function getPymesByCategory(categoria) {
     try {
         // Verificar si la categoría es válida
         if (!CATEGORIA.includes(categoria)) {
+            console.log(`Categoría inválida: ${categoria}`);
             return [null, "Categoría inválida"];
         }
 
-        // Buscar todas las categorías con el tipo de servicio especificado
-        const categories = await CategoriaModel.find({ categoria: categoria }).exec();
+        // Buscar todas las Pymes con la categoría especificada
+        const pymes = await Pyme.find({ categoria }).exec();
+        console.log(`Pymes encontradas: ${pymes}`);
 
-        if (!categories || categories.length === 0) {
+        if (!pymes || pymes.length === 0) {
+            console.log(`No se encontraron pymes para la categoría: ${categoria}`);
             return [null, "No se encontraron pymes con esa categoría"];
         }
-
-        // Extraer los IDs de las Pymes asociadas a esas categorías
-        const pymeIds = categories.map((cat) => cat.idPyme);
-
-        // Buscar todas las Pymes con esos IDs
-        const pymes = await Pyme.find({ _id: { $in: pymeIds } }).exec();
 
         return [pymes, null];
     } catch (error) {
         handleError(error, "pyme.service -> getPymesByCategory");
+        return [null, "Error al buscar pymes por categoría"];
     }
-} 
+}
 /**
- * Filtrar pymes por categoría y comuna
+ * Filtrar pymes por categoría y comuna REVISAR/STANDBY
  */
 async function getPymesByCategoryAndComuna(categoria, comuna) {
     try {
@@ -184,25 +183,19 @@ async function getPymesByCategoryAndComuna(categoria, comuna) {
             return [null, "Categoría inválida"];
         }
 
-        // Buscar todas las categorías con el tipo de servicio especificado
-        const categories = await CategoriaModel.find({ tipoServicio: categoria }).exec();
+       // Buscar todas las Pymes con la categoría y comuna especificadas
+       const pymes = await Pyme.find({ categoria, comuna }).exec();
 
-        if (!categories || categories.length === 0) {
-            return [null, "No se encontraron pymes con esa categoría"];
+        if (!pymes || pymes.length === 0) {
+            return [null, "No se encontraron pymes con esa categoría y comuna"];
         }
-
-        // Extraer los IDs de las Pymes asociadas a esas categorías
-        const pymeIds = categories.map((cat) => cat.idPyme);
-
-        // Buscar todas las Pymes con esos IDs y en la comuna especificada
-        const pymes = await Pyme.find({ _id: { $in: pymeIds }, comuna }).exec();
 
         return [pymes, null];
     } catch (error) {
-        handleError(error, "pyme.service -> getPymesByCategoryAndComuna"); 
+        handleError(error, "pyme.service -> getPymesByCategoryAndComuna");
+        return [null, "Error al buscar pymes por categoría y comuna"];
     }
 }
-
 
 // Exporta las funciones del servicio de pymes
 export default {

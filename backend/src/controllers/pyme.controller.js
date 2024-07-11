@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable max-len */
 "use strict";
 
@@ -89,12 +90,21 @@ async function getPymesByName(req, res) {
 async function getPymesByComuna(req, res) {
     try {
         const { comuna } = req.params;
+        
+
         const [pymes, errorPymes] = await PymeService.getPymesByComuna(comuna);
-        if (errorPymes) return respondError(req, res, 404, errorPymes);
-    
-        if (errorPymes) return respondError(req, res, 404, errorPymes);
-        if (!pymes) return respondSuccess(req, res, 204); // No Content
+        if (errorPymes) {
+            return respondError(req, res, 404, errorPymes);
+        }
+
+        if (!pymes) {
+            console.log("No se encontraron pymes en la comuna:", comuna);
+            return respondSuccess(req, res, 204); // No Content
+        }
+
+        respondSuccess(req, res, 200, pymes);
     } catch (error) {
+        console.error("Error en el controlador de obtener pymes por comuna:", error);
         handleError(error, "pyme.controller -> getPymesByComuna");
         respondError(req, res, 400, `Error obteniendo las pymes por comuna: ${error.message}`);
     }
@@ -137,22 +147,33 @@ async function deletePyme(req, res) {
         respondError(req, res, 400, `Error eliminando la pymes por id: ${error.message}`);
     }
 } 
-
-
 /**
- * Filtrar pymes por categoría --  REVISAR/SIN PROBAR
+ * Filtrar pymes por categoría
  */  
-async function getPymesByCategory(req, res) { 
-    try { 
-        const { categoria } = req.params; 
-        const [pymes, errorPymes] = await PymeService.getPymesByCategory(categoria); 
-        if (errorPymes) return respondError(req, res, 404, errorPymes); 
-        if (!pymes) return respondSuccess(req, res, 204); 
-    } catch (error) { 
-        handleError(error, "pyme.controller -> getPymesByCategory"); 
-        respondError(req, res, 400, `Error obteniendo las pymes por categoría: ${error.message}`); 
-    } 
+async function getPymesByCategory(req, res) {
+    try {
+        const { categoria } = req.params;
+        console.log(`Petición para obtener pymes por categoría: ${categoria}`);
+        
+        const [pymes, errorPymes] = await PymeService.getPymesByCategory(categoria);
+        if (errorPymes) {
+            console.log(`Error al obtener pymes: ${errorPymes}`);
+            return respondError(req, res, 404, errorPymes);
+        }
+        if (!pymes) {
+            console.log(`No se encontraron pymes para la categoría: ${categoria}`);
+            return respondSuccess(req, res, 204);
+        }
+
+        console.log(`Pymes obtenidas: ${JSON.stringify(pymes)}`);
+        return respondSuccess(req, res, 200, pymes);
+    } catch (error) {
+        handleError(error, "pyme.controller -> getPymesByCategory");
+        console.log(`Error al obtener pymes por categoría: ${error.message}`);
+        respondError(req, res, 400, `Error obteniendo las pymes por categoría: ${error.message}`);
+    }
 } 
+
 /**
  * Filtrar pymes por categoría y comuna
  */
@@ -175,7 +196,6 @@ export default {
     getPymesByComuna,
     updatePyme,
     deletePyme, 
-
     getPymesByCategory, 
     getPymesByCategoryAndComuna,
 };

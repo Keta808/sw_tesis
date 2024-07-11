@@ -1,3 +1,7 @@
+/* eslint-disable func-call-spacing */
+/* eslint-disable spaced-comment */
+/* eslint-disable max-len */
+/* eslint-disable require-jsdoc */
 "use strict";
 import HoraSlot from "../models/horaSlot.model.js";
 import { handleError } from "../utils/errorHandler.js";
@@ -74,12 +78,10 @@ async function deleteHoraSlotById(id) {
 
 async function updateHoraSlotById(id, horaSlot) {
     try {
-        const updatedHoraSlot = await HoraSlot.findByIdAndUpdate
-        (id, horaSlot, { new: true }).exec();
+        const updatedHoraSlot = await HoraSlot.findByIdAndUpdate(id, horaSlot, { new: true }).exec();
         if (!updatedHoraSlot) return [null, "La hora no existe"];      
         return [updatedHoraSlot, null];
-    }
-    catch (error) {
+    } catch (error) {
         handleError(error, "horaSlot.service -> updateHoraSlotById");
     }
 }
@@ -133,7 +135,7 @@ async function createRangeHour(idPyme, date, startTime, endTime, interval) {
 
         const slots = generarRangoHora(start, end, interval);
 
-        const horaSlots = slots.map(slot => ({
+        const horaSlots = slots.map((slot) => ({
             idPyme,
             fecha: slot,
             hora: slot.toTimeString().slice(0, 5),
@@ -149,7 +151,7 @@ async function createRangeHour(idPyme, date, startTime, endTime, interval) {
     }
 }
 
-export default{
+export default {
     getHoraSlots,
     getHoraSlotsDisponibles,
     createHoraSlot,

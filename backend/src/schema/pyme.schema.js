@@ -2,7 +2,8 @@
 
 import Joi from "joi";
 const phoneRegex = /^[0-9]{9}$/; // Solo acepta 9 digitos
-
+import TipoServicio from "../constants/categoria.constant.js";
+import Comunas from "../constants/comuna.constant.js";  
 /**
  * Esquema de validacion para el cuerpo de la solicitud de pyme
  */
@@ -36,12 +37,11 @@ const pymeBodySchema = Joi.object({
         "string.base": "El telefono debe ser de tipo string.",
         "string.pattern.base": "El telefono debe tener exactamente 9 digitos.",
     }),
-    comuna: Joi.string().min(3).max(100).required().messages({
+    comuna: Joi.string().valid(...Comunas).required().messages({
         "string.empty": "La comuna no puede estar vacía.",
         "any.required": "La comuna es obligatoria.",
         "string.base": "La comuna debe ser de tipo string.",
-        "string.min": "La comuna debe tener al menos 3 caracteres.",
-        "string.max": "La comuna debe tener como máximo 100 caracteres.",
+        "any.only": "La comuna debe ser una de las comunas válidas.",
     }),
     direccion: Joi.string().min(3).max(200).required().messages({
         "string.empty": "La direccion no puede estar vacía.",
@@ -55,7 +55,17 @@ const pymeBodySchema = Joi.object({
         "any.required": "El email es obligatorio.",
         "string.base": "El email debe ser de tipo string.",
         "string.email": "El email debe tener un formato válido.",
-    }),
+    }), 
+    categoria: Joi.string()
+        .valid(...TipoServicio)
+        .required()
+        .messages({
+            "string.empty": "La categoría no puede estar vacía.",
+            "any.required": "La categoría es obligatoria.",
+            "string.base": "La categoría debe ser de tipo string.",
+            // eslint-disable-next-line max-len
+            "any.only": "La categoría debe ser una de las siguientes: " + TipoServicio.join(", ") + ".",
+        }),
     }).messages({
     "object.unknown": "No se permiten propiedades adicionales.",
     });
