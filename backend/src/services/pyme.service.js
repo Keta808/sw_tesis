@@ -11,7 +11,7 @@ import { handleError } from "../utils/errorHandler.js";
  */
 async function getPymes() {
   try {
-    const pymes = await Pyme.find().exec();
+    const pymes = await Pyme.aggregate([{ $sample: { size: await Pyme.countDocuments() } }]).exec();
     if (!pymes) return [null, "No hay pymes"];
 
     return [pymes, null];
@@ -92,10 +92,12 @@ async function getPymesByName(nombre) {
  */
 async function getPymesByComuna(comuna) {
     try {
-        const pymes = await Pyme.find({ comuna }).exec();
-        if (!pymes || pymes.length === 0) {
-            return [null, "No se encontraron pymes en la comuna"];
-        }
+        const count = await Pyme.countDocuments({ comuna });
+        if (count === 0) return [null, "No se encontraron pymes en la comuna"];
+
+        const pymes = await Pyme.aggregate([
+            { $match: { comuna } },
+            { $sample: { size: count } }]).exec();
 
         return [pymes, null];
     } catch (error) {
