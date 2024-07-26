@@ -16,5 +16,6 @@ router.put("/:id", isAdmin, horaSlotController.updateHoraSlotById);
 router.get("/:id", horaSlotController.getHoraSlotById);
 router.post("/create-range-hour", horaSlotController.createRangeHour);
 router.get("/idPyme/:idPyme", horaSlotController.getHoraSlotByIdPyme);
+router.get("/sorted/:idPyme", horaSlotController.getSortedHoraSlots);
 
 export default router;

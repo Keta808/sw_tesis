@@ -126,7 +126,7 @@ async function getHoraSlotById(req, res) {
 }
 
 /** Crear slots de horario en un rango */
-async function createRangeHourController(req, res) {
+async function createRangeHour(req, res) {
     try {
         const { idPyme, date, startTime, endTime, interval } = req.body;
 
@@ -140,12 +140,16 @@ async function createRangeHourController(req, res) {
             return res.status(500).json({ error });
         }
 
+        console.log("Slots creados exitosamente:", createdSlots);
         return res.status(201).json({ message: "Slots creados exitosamente", slots: createdSlots });
     } catch (error) {
+        console.error("Error en createRangeHourController:", error);
         handleError(error, "horaSlot.controller -> createRangeHourController");
         return res.status(500).json({ error: "Error al crear los slots de horario" });
     }
 }
+
+
 
 /** Obtener las horas por la id de la pyme */
 async function getHoraSlotByIdPyme(req, res) {
@@ -161,6 +165,29 @@ async function getHoraSlotByIdPyme(req, res) {
     }
 }
 
+
+// funcion para obtener un slot de horario por id
+async function getSortedHoraSlots(req, res) {
+    try {
+        const { idPyme } = req.params;
+
+        if (!idPyme) {
+            return res.status(400).json({ error: "Falta el parámetro idPyme" });
+        }
+
+        const [horaSlots, error] = await HoraSlotService.getSortedHoraSlots(idPyme);
+
+        if (error) {
+            return res.status(500).json({ error });
+        }
+
+        return res.status(200).json({ slots: horaSlots });
+    } catch (error) {
+        console.error("Error en getSortedHoraSlotsController:", error);
+        return res.status(500).json({ error: "Error al obtener los slots de horario" });
+    }
+}
+
 export default {
     getHoraSlots,
     getHoraSlotsDisponibles,
@@ -169,6 +196,6 @@ export default {
     updateHoraSlotById,
     getHoraSlotById,
     getHoraSlotByIdPyme,
-    createRangeHour: createRangeHourController,
-
+    createRangeHour,
+    getSortedHoraSlots,
 };
